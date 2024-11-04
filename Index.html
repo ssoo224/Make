@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع البريد الإلكتروني الوهمي <i class="fas fa-envelope"></i></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- إضافة مكتبة Font Awesome -->
+    <style>
+        /* CSS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ffdd00, #ffcc00); /* تدرج ذهبي */
+        }
+
+        .container {
+            background-color: #ffffff; /* لون الخلفية */
+            border-radius: 12px;
+            padding: 25px;
+            width: 340px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        h1 {
+            color: #b8860b; /* لون النص */
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #ffcc00; /* لون الزر */
+            color: #ffffff; /* لون نص الزر */
+            border: none;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin: 10px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s;
+            width: 100%;
+        }
+
+        button:disabled {
+            background-color: #cccccc; /* لون الزر عند التعطيل */
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #e6b800; /* لون الزر عند التمرير */
+            transform: translateY(-2px);
+        }
+
+        #emailDisplay {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff8e1; /* لون خلفية حقل البريد */
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+        }
+
+        #emailText {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333; /* لون النص */
+            flex: 1;
+            overflow-wrap: break-word;
+        }
+
+        #copyEmailBtn {
+            background-color: #ffcc00; /* لون زر النسخ */
+            color: #fff;
+            border: none;
+            border-radius: 12px; /* جعل الزر مربعا مقوسا */
+            padding: 4px 8px; /* تقليل عرض الزر */
+            font-size: 12px; /* تقليل حجم الخط */
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-left: 10px; /* إضافة مسافة بين زر النسخ والبريد */
+        }
+
+        #copyEmailBtn:hover {
+            background-color: #e6b800; /* لون الزر عند التمرير */
+        }
+
+        #messagesDisplay div {
+            background-color: #fff8e1; /* لون خلفية الرسائل */
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            text-align: left;
+            direction: rtl;
+        }
+
+        #messagesDisplay div {
+            border-left: 4px solid #ffcc00; /* لون الحدود */
+            padding-left: 15px;
+        }
+
+        a {
+            color: #b8860b; /* لون الروابط */
+            text-decoration: underline;
+        }
+
+        p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #333; /* لون النص */
+        }
+
+        #notification {
+            background-color: rgba(255, 215, 0, 0.9); /* لون ذهبي فاتح مع الشفافية */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px; /* حواف مقوسة */
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none; /* مخفي بشكل افتراضي */
+            z-index: 1000; /* يظهر فوق العناصر الأخرى */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* ظل لتحسين الشكل */
+            font-size: 16px; /* زيادة حجم الخط */
+            font-weight: bold; /* جعل الكتابة غليضة */
+            transition: opacity 0.5s ease; /* تأثير الانتقال */
+        }
+
+        #usedEmails {
+            margin-top: 20px;
+            text-align: left;
+            background-color: #fff8e1; /* لون خلفية الإيميلات المستخدمة */
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            max-height: 150px;
+            overflow-y: auto;
+            direction: rtl; /* اتجاه النص من اليمين إلى اليسار */
+        }
+
+        .emailItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+        }
+
+        .checkbox {
+            margin-left: 10px;
+        }
+
+        #trashBin {
+            margin-top: 20px;
+            background-color: #fff8e1; /* لون خلفية سلة المهملات */
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            display: none; /* مخفي بشكل افتراضي */
+        }
+
+        #deleteSelectedBtn {
+            background-color: #e74c3c; /* لون زر الحذف */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        #deleteSelectedBtn:hover {
+            background-color: #c0392b; /* لون الزر عند التمرير */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="notification">تم النسخ</div>
+    <div class="container">
+        <h1><i class="fas fa-envelope"></i> مولد البريد الإلكتروني الوهمي</h1> <!-- إضافة أيقونة الإيميل -->
+        <button id="generateEmailBtn">إنشاء إيميل</button>
+        <div id="emailDisplay" style="display: none;">
+            <span id="emailText"></span>
+            <button id="copyEmailBtn" onclick="copyEmail()">نسخ</button>
+        </div>
+        <button id="fetchMessagesBtn" disabled>جلب الرسائل</button>
+        <button id="showUsedEmailsBtn" onclick="toggleUsedEmails()">عرض الإيميلات المستخدمة</button>
+        <div id="usedEmails" style="display: none;"></div> <!-- حقل لعرض الإيميلات المستخدمة -->
+        <div id="messagesDisplay"></div>
+        <div id="trashBin">
+            <h3>سلة المهملات</h3>
+            <div id="deletedEmails"></div>
+            <button id="deleteSelectedBtn" onclick="deleteSelectedEmails()">حذف المحدد</button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript
+        document.getElementById("generateEmailBtn").addEventListener("click", generateEmail);
+        document.getElementById("fetchMessagesBtn").addEventListener("click", fetchMessages);
+
+        let currentEmail = null;
+        const usedEmails = []; // مصفوفة لتخزين الإيميلات المستخدمة
+        const deletedEmails = []; // مصفوفة لتخزين الإيميلات المحذوفة
+
+        async function generateEmail() {
+            const response = await fetch('https://www.1secmail.com/api/v1/?action=genRandomMailbox');
+            const [email] = await response.json();
+            currentEmail = email;
+
+            document.getElementById("emailText").textContent = currentEmail;
+            document.getElementById("emailDisplay").style.display = "flex";
+            document.getElementById("fetchMessagesBtn").disabled = false; // تمكين زر جلب الرسائل
+            usedEmails.push(currentEmail); // إضافة الإيميل إلى المصفوفة
+            updateUsedEmailsDisplay(); // تحديث عرض الإيميلات المستخدمة
+        }
+
+        function copyEmail() {
+            navigator.clipboard.writeText(currentEmail)
+                .then(() => {
+                    showNotification("تم النسخ");
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById("notification");
+            notification.textContent = message;
+            notification.style.display = "block";
+            notification.style.opacity = 1;
+            notification.animate([{opacity: 0}, {opacity: 1}], {duration: 500, fill: 'forwards'})
+                .onfinish = () => {
+                    setTimeout(() => {
+                        notification.animate([{opacity: 1}, {opacity: 0}], {duration: 500, fill: 'forwards'})
+                            .onfinish = () => {
+                                notification.style.display = "none";
+                            };
+                    }, 2000);
+                };
+        }
+
+        function toggleUsedEmails() {
+            const usedEmailsDiv = document.getElementById("usedEmails");
+            usedEmailsDiv.style.display = usedEmailsDiv.style.display === "none" ? "block" : "none";
+        }
+
+        function updateUsedEmailsDisplay() {
+            const usedEmailsDiv = document.getElementById("usedEmails");
+            usedEmailsDiv.innerHTML = ""; // مسح العناصر السابقة
+
+            usedEmails.forEach(email => {
+                const emailItem = document.createElement("div");
+                emailItem.className = "emailItem";
+                emailItem.innerHTML = `
+                    <input type="checkbox" class="checkbox" id="${email}" onchange="updateTrashBinVisibility()" />
+                    <label for="${email}">${email}</label>
+                `;
+                usedEmailsDiv.appendChild(emailItem);
+            });
+        }
+
+        function updateTrashBinVisibility() {
+            const checkboxes = document.querySelectorAll(".checkbox");
+            const trashBin = document.getElementById("trashBin");
+            const hasChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+            trashBin.style.display = hasChecked ? "block" : "none"; // إظهار سلة المهملات إذا تم تحديد أي إيميل
+        }
+
+        function deleteSelectedEmails() {
+            const checkboxes = document.querySelectorAll(".checkbox:checked");
+            checkboxes.forEach(checkbox => {
+                const email = checkbox.id;
+                const index = usedEmails.indexOf(email);
+                if (index > -1) {
+                    deletedEmails.push(email); // إضافة الإيميل المحذوف إلى سلة المهملات
+                    usedEmails.splice(index, 1); // حذف الإيميل من المصفوفة
+                }
+            });
+            updateUsedEmailsDisplay(); // تحديث عرض الإيميلات
+            updateDeletedEmailsDisplay(); // تحديث عرض سلة المهملات
+            updateTrashBinVisibility(); // تحديث ظهور سلة المهملات
+        }
+
+        function updateDeletedEmailsDisplay() {
+            const deletedEmailsDiv = document.getElementById("deletedEmails");
+            deletedEmailsDiv.innerHTML = ""; // مسح العناصر السابقة
+
+            deletedEmails.forEach(email => {
+                const emailItem = document.createElement("div");
+                emailItem.innerHTML = `${email}`;
+                deletedEmailsDiv.appendChild(emailItem);
+            });
+        }
+
+        async function fetchMessages() {
+            if (!currentEmail) return;
+
+            const [username, domain] = currentEmail.split("@");
+            const response = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${username}&domain=${domain}`);
+            const messages = await response.json();
+
+            const messagesDisplay = document.getElementById("messagesDisplay");
+            messagesDisplay.innerHTML = "";  // Clear previous messages
+
+            if (messages.length === 0) {
+                messagesDisplay.innerHTML = "<p>✎┊‌ لا توجد رسائل جديدة.</p>";
+            } else {
+                messages.forEach(async (message) => {
+                    const messageContent = await fetchMessageContent(username, domain, message.id);
+                    const messageText = messageContent.textBody || messageContent.htmlBody || "✎┊‌ الرسالة فارغه";
+
+                    // تحويل الروابط لجعلها قابلة للنقر
+                    const linkifiedText = messageText.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+
+                    const messageDiv = document.createElement("div");
+                    messageDiv.innerHTML = `
+                        <p><strong>المرسل:</strong> ${message.from}</p>
+                        <p><strong>الموضوع:</strong> ${message.subject}</p>
+                        <p>${linkifiedText}</p>`;
+                    messagesDisplay.appendChild(messageDiv);
+                });
+            }
+        }
+
+        async function fetchMessageContent(username, domain, messageId) {
+            const response = await fetch(`https://www.1secmail.com/api/v1/?action=readMessage&login=${username}&domain=${domain}&id=${messageId}`);
+            return response.json();
+        }
+    </script>
+</body>
+</html>
